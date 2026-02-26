@@ -7,9 +7,8 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class LoginResponseDTO {
-    
-    private String message;
-    private String token;
-    private String refreshToken;
+public class UserClaimsDTO {
+    private Long id;
+    private String email;
+    private String[] roles;
 }
