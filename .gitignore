@@ -33,3 +33,6 @@ build/
 .vscode/
 
 PLAN.md
+
+
+application-local.properties

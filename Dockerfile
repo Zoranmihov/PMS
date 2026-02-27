@@ -9,4 +9,4 @@ COPY app/ /workspace/
 
 EXPOSE 8080
 
-CMD ["mvn", "spring-boot:run", "-Dspring-boot.run.profiles=docker"]
+CMD ["mvn", "spring-boot:run", "-Dspring-boot.run.profiles=local"]

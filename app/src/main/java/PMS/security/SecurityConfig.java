@@ -8,7 +8,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import PMS.user.JwtUtil.JwtUtil;
+import PMS.user.Util.JwtUtil;
 
 @Configuration
 @EnableWebSecurity
@@ -24,8 +24,9 @@ public class SecurityConfig {
         private static final String[] PUBLIC = {
                         "/api/v1/users/register",
                         "/api/v1/users/login",
-                        "/api/v1/users/refresh"
-        };
+                        "/api/v1/users/refresh",
+                        "/api/v1/users/activate"
+        };              
 
         private static final String[] USER = {
                         "/api/v1/users/test"

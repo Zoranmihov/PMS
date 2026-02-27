@@ -2,6 +2,7 @@ package PMS.user.Controllers;
 
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import PMS.user.DTO.LoginDTO;
@@ -29,8 +30,11 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @Value("${jwt_expiration}")
+    @Value("${jwt.expiration}")
     private int jwtExpiration;
+
+    @Value("${spring.mail.password}")
+    private String smtp_password;
 
     @GetMapping("/test")
     public String getMethodName() {
@@ -40,6 +44,7 @@ public class UserController {
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDTO> userLogin(@RequestBody LoginDTO loginDTO) {
+        System.out.println( smtp_password);
         LoginResponseDTO loginResponseDTO = userService.loginUser(loginDTO);
 
         ResponseCookie cookie = ResponseCookie.from("access_token", loginResponseDTO.getToken())
@@ -76,4 +81,12 @@ public class UserController {
         .header(HttpHeaders.SET_COOKIE, cookie.toString())
         .body(newAccessToken);
     }
+
+    @GetMapping("/activate")
+    public ResponseEntity<String> activate(@RequestParam(value = "token", required = true) String token) {
+        String message = userService.activateAccount(token);
+       return new ResponseEntity<>(message, HttpStatus.OK);
+    }
+
 }
+

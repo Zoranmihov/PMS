@@ -1,4 +1,4 @@
-package PMS.user.JwtUtil;
+package PMS.user.Util;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
@@ -18,13 +18,13 @@ import jakarta.annotation.PostConstruct;
 @Component
 public class JwtUtil {
 
-    @Value("${jwt_secret}")
+    @Value("${jwt.secret}")
     private String jwtSecret;
 
-    @Value("${jwt_expiration}")
+    @Value("${jwt.expiration}")
     private int jwtExpiration;
 
-    @Value("${jwt_refresh_expiration}")
+    @Value("${jwt.refresh.expiration}")
     private int jwtRefreshExpiration;
 
     private SecretKey key;
