@@ -1,5 +1,8 @@
 package PMS.user.Startup;
 
+import java.util.EnumSet;
+import java.util.Set;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
@@ -7,6 +10,7 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import PMS.user.Enteties.Role;
 import PMS.user.Enteties.User;
 import PMS.user.Repositories.UserRepository;
 import jakarta.transaction.Transactional;
@@ -34,7 +38,7 @@ public class AdminSeeder implements ApplicationRunner {
             return;
         }
 
-        String[] roles = new String[] { "ADMIN" };
+        Set<Role> roles = EnumSet.of(Role.USER, Role.ADMIN);
 
         User admin = new User(
                 adminEmail,

@@ -1,19 +1,23 @@
 package PMS.user.Services;
 
+import java.util.EnumSet;
+import java.util.Set;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-
 import PMS.user.DTO.LoginDTO;
 import PMS.user.DTO.LoginResponseDTO;
 import PMS.user.DTO.RegisterDTO;
+import PMS.user.Enteties.Role;
 import PMS.user.Enteties.User;
 import PMS.user.Exceptions.ApiException;
 import PMS.user.Repositories.UserRepository;
 import PMS.user.Util.ActivationUtil;
 import PMS.user.Util.JwtUtil;
 import io.jsonwebtoken.Claims;
+import jakarta.transaction.Transactional;
 
 @Service
 public class UserService {
@@ -43,7 +47,7 @@ public class UserService {
                     registerDTO.email(),
                     passwordEncoder().encode(registerDTO.password()),
                     registerDTO.name(),
-                    new String[] { "USER", "ADMIN" },
+                     EnumSet.of(Role.USER),
                     false);
             String activationToken = activationUtil.generateActivationToken(registerDTO.email());
             mailService.sendActivationMail(registerDTO.email(), activationToken);
@@ -95,5 +99,17 @@ public class UserService {
                 .orElseThrow(() -> new ApiException(401, "User not found"));
 
         return jwtUtil.generateToken(user.getId(), user.getEmail(), user.getRoles());
+    }
+
+    @Transactional
+    public String setRoles(Long userId, Set<Role> roles) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ApiException(404, "User not found"));
+        user.getRoles().clear();
+        if (roles != null) {
+            user.getRoles().addAll(roles);
+        }
+        user.getRoles().add(Role.USER);
+        return "Success";
     }
 }

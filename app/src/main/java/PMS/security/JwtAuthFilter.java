@@ -49,7 +49,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         }
 
         UserClaimsDTO claims = jwtUtil.getUserFromToken(token);
-
         var authorities = Arrays.stream(claims.getRoles())
                 .map(role -> "ROLE_" + role)
                 .map(SimpleGrantedAuthority::new)

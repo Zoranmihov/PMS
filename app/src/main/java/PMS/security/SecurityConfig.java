@@ -2,6 +2,8 @@ package PMS.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -26,23 +28,32 @@ public class SecurityConfig {
                         "/api/v1/users/login",
                         "/api/v1/users/refresh",
                         "/api/v1/users/activate"
-        };              
+        };
 
         private static final String[] USER = {
                         "/api/v1/users/test"
         };
 
         private static final String[] ADMIN = {
-
+                "/api/v1//user/{id}/roles"
         };
 
         @Bean
-        public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthFilter jwtAuthFilter) throws Exception {
+        RoleHierarchy roleHierarchy() {
+                return RoleHierarchyImpl.fromHierarchy("""
+                                    ROLE_ADMIN > ROLE_USER
+                                """);
+        }
+
+        @Bean
+        public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthFilter jwtAuthFilter)
+                        throws Exception {
                 return http
                                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                                 .authorizeHttpRequests(auth -> auth
                                                 .requestMatchers(PUBLIC).permitAll()
                                                 .requestMatchers(USER).hasRole("USER")
+                                                .requestMatchers(ADMIN).hasRole("ADMIN")
                                                 .anyRequest().authenticated())
                                 .csrf(csrf -> csrf.disable())
                                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
