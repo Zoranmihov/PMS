@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import PMS.user.DTO.AdminCreateUserDTO;
 import PMS.user.DTO.LoginDTO;
 import PMS.user.DTO.LoginResponseDTO;
 import PMS.user.DTO.RegisterDTO;
@@ -15,8 +17,10 @@ import PMS.user.Enteties.User;
 import PMS.user.Exceptions.ApiException;
 import PMS.user.Repositories.UserRepository;
 import PMS.user.Util.ActivationUtil;
+import PMS.user.Util.DeactivationUtil;
 import PMS.user.Util.JwtUtil;
 import io.jsonwebtoken.Claims;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 
 @Service
@@ -30,6 +34,9 @@ public class UserService {
 
     @Autowired
     ActivationUtil activationUtil;
+
+    @Autowired
+    DeactivationUtil deactivationUtil;
 
     @Autowired
     MailService mailService;
@@ -47,7 +54,7 @@ public class UserService {
                     registerDTO.email(),
                     passwordEncoder().encode(registerDTO.password()),
                     registerDTO.name(),
-                     EnumSet.of(Role.USER),
+                    EnumSet.of(Role.USER),
                     false);
             String activationToken = activationUtil.generateActivationToken(registerDTO.email());
             mailService.sendActivationMail(registerDTO.email(), activationToken);
@@ -112,4 +119,42 @@ public class UserService {
         user.getRoles().add(Role.USER);
         return "Success";
     }
+
+    public String requestAccountDeletion(String email) {
+        String deactivationToken = deactivationUtil.generateDeactivationToken(email);
+        mailService.sendDelationMail(email, deactivationToken);
+        return "Deactiation token was sent";
+    }
+
+    @Transactional
+    public String deleteAccount(String token) {
+        String email = deactivationUtil.validateAndGetDeactivationEmail(token);
+        int deleted = userRepository.deleteByEmail(email);
+
+        if (deleted == 0) {
+            throw new ApiException(404, "User not found");
+        }
+        return "Deleted";
+    }
+
+    // Admin functions
+
+    public String createUserAsAdmin(AdminCreateUserDTO adminCreateUserDTO) {
+        if(userRepository.existsByEmail(adminCreateUserDTO.email())) {
+            throw new ApiException(409, "Email is already in use");
+        }
+
+        User newUser = new User(
+            adminCreateUserDTO.email(),
+            passwordEncoder().encode(adminCreateUserDTO.password()),
+            adminCreateUserDTO.name(),
+            adminCreateUserDTO.roles(),
+            adminCreateUserDTO.activated()
+        );
+
+        userRepository.save(newUser);
+
+        return "Success";
+    }
+
 }

@@ -27,15 +27,18 @@ public class SecurityConfig {
                         "/api/v1/users/register",
                         "/api/v1/users/login",
                         "/api/v1/users/refresh",
-                        "/api/v1/users/activate"
+                        "/api/v1/users/activate",
+                        "/api/v1/users/user/delete"
         };
 
         private static final String[] USER = {
-                        "/api/v1/users/test"
+                        "/api/v1/users/test",
+                        "/api/v1/users/user/requestdelete"
+                        
         };
 
         private static final String[] ADMIN = {
-                "/api/v1//user/{id}/roles"
+                "/api/v1/admin/user/{id}/roles"
         };
 
         @Bean

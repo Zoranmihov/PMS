@@ -23,6 +23,8 @@ public class MailService {
     @Value("${app.public-base-url}")
     private String publicBaseUrl;
 
+    
+    
     @Async("mailExecutor")
     public void sendActivationMail(String to, String token) {
         try {
@@ -40,6 +42,33 @@ public class MailService {
 
             String htmlBody = "<p>Activate your account</p>" +
                     "<p><a href=\"" + activationUrl + "\">Activate account</a></p>" +
+                    "<p>If you didn't request this, ignore the email.</p>";
+
+            helper.setText(textBody, htmlBody);
+            mailSender.send(message);
+
+        } catch (MessagingException e) {
+            System.err.println(e);
+        }
+    }
+
+    @Async("mailExecutor")
+    public void sendDelationMail(String to, String token) {
+        try {
+            String activationUrl = publicBaseUrl + "/api/v1/users/user/delete?token=" +
+                    URLEncoder.encode(token, StandardCharsets.UTF_8);
+
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+            helper.setTo(to);
+            helper.setSubject("Delete your account");
+
+            String textBody = "Delete your account\n\n" +
+                    "Open this link to Delete:\n" + activationUrl + "\n\n" +
+                    "If you didn't request this, ignore the email.\n";
+
+            String htmlBody = "<p>Delete your account</p>" +
+                    "<p><a href=\"" + activationUrl + "\">Delete account</a></p>" +
                     "<p>If you didn't request this, ignore the email.</p>";
 
             helper.setText(textBody, htmlBody);
