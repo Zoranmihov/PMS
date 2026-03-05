@@ -21,6 +21,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Transactional
     @Query("update User u set u.active = true where u.email = :email")
     int activateByEmail(@Param("email") String email);
-
+    @Transactional
     int deleteByEmail(String email);
 }

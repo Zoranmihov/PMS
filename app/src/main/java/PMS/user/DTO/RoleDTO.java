@@ -5,7 +5,6 @@ import java.util.Set;
 import PMS.user.Enteties.Role;
 
 public record RoleDTO(
-   Set<Role> roles
-) {
-    
+      Set<Role> roles) {
+
 }

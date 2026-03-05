@@ -8,12 +8,11 @@ import PMS.user.DTO.LoginDTO;
 import PMS.user.DTO.LoginResponseDTO;
 import PMS.user.DTO.RefreshDTO;
 import PMS.user.DTO.RegisterDTO;
+import PMS.user.DTO.UpdateAccountInfoDTO;
 import PMS.user.Services.UserService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.PostMapping;
-
 import java.security.Principal;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -21,6 +20,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -85,11 +85,10 @@ public class UserController {
         return new ResponseEntity<String>(message, HttpStatus.OK);
     }
 
-
     @GetMapping("/user/requestdelete")
     public ResponseEntity<String> requestAccountDeletion(Principal principal) {
         String message = userService.requestAccountDeletion(principal.getName());
-       return new ResponseEntity<String>(message, HttpStatus.OK);
+        return new ResponseEntity<String>(message, HttpStatus.OK);
     }
 
     @GetMapping("/user/delete")
@@ -97,5 +96,27 @@ public class UserController {
         String message = userService.deleteAccount(token);
         return new ResponseEntity<String>(message, HttpStatus.OK);
     }
-    
+
+    @PutMapping("/user/update")
+    public ResponseEntity<LoginResponseDTO> updateAccountInformation(Principal principal,
+            @RequestBody UpdateAccountInfoDTO updateAccountInfoDTO) {
+
+        LoginResponseDTO responseDTO = userService.updateAccountInformation(principal.getName(), updateAccountInfoDTO);
+
+        if (responseDTO.getToken() != null && !responseDTO.getToken().isBlank()) {
+            ResponseCookie cookie = ResponseCookie.from("access_token", responseDTO.getToken())
+                    .httpOnly(true)
+                    .secure(true)
+                    .sameSite("Lax")
+                    .path("/")
+                    .maxAge(jwtExpiration / 1000)
+                    .build();
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                    .body(responseDTO);
+        }
+
+        return ResponseEntity.ok().body(responseDTO);
+
+    }
 }

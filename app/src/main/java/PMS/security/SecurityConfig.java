@@ -33,12 +33,15 @@ public class SecurityConfig {
 
         private static final String[] USER = {
                         "/api/v1/users/test",
-                        "/api/v1/users/user/requestdelete"
+                        "/api/v1/users/user/requestdelete",
+                        "/api/v1/users/user/update"
                         
         };
 
         private static final String[] ADMIN = {
-                "/api/v1/admin/user/{id}/roles"
+                "/api/v1/admin/user/{id}/roles",
+                "/api/v1/admin/user/delete",
+                "/api/v1/admin/user/update"
         };
 
         @Bean
