@@ -44,7 +44,7 @@ public class UserService {
 
     private static final Pattern emailRegex = Pattern.compile("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$");
     private static final Pattern passwordRegex = Pattern
-            .compile("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\\\d)(?=.*[^A-Za-z0-9]).{8,20}$");
+            .compile("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z0-9]).{8,20}$");
 
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
@@ -95,7 +95,7 @@ public class UserService {
 
     public String refreshJwt(String refreshToken) {
         if (!jwtUtil.validateJwt(refreshToken)) {
-            new ApiException(401, "Invalid token");
+            throw new ApiException(401, "Invalid token");
         }
 
         Claims claims = jwtUtil.parseClaims(refreshToken);
